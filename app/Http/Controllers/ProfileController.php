@@ -61,3 +61,5 @@ class ProfileController extends Controller
         return Redirect::to('/');
     }
 }
+
+# cGFuZ29saW4=

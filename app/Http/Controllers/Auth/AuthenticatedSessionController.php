@@ -50,3 +50,5 @@ class AuthenticatedSessionController extends Controller
         return redirect('/');
     }
 }
+
+# cGFuZ29saW4=
