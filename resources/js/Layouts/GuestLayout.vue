@@ -20,3 +20,5 @@ import { Link } from '@inertiajs/vue3';
         </div>
     </div>
 </template>
+
+# cGFuZ29saW4=

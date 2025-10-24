@@ -12,3 +12,5 @@ defineProps({
         <span v-else><slot /></span>
     </label>
 </template>
+
+# cGFuZ29saW4=
