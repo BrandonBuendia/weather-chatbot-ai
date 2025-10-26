@@ -18,11 +18,11 @@
                     ✨ Iniciar Nueva Conversación
                 </button>
 
-                <div v-if="conversations.length > 0" class="mt-8">
+                <div v-if="conversationsList.length > 0" class="mt-8">
                     <h2 class="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">Conversaciones Recientes</h2>
                     <div class="space-y-3">
                         <a
-                            v-for="conv in conversations"
+                            v-for="conv in conversationsList"
                             :key="conv.id"
                             :href="route('chat.show', conv.id)"
                             class="block bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 p-4 rounded-lg transition-all border border-gray-200 dark:border-gray-600"
@@ -33,6 +33,9 @@
                             </div>
                         </a>
                     </div>
+
+                    <!-- Pagination -->
+                    <Pagination v-if="conversations.links" :links="conversations.links" />
                 </div>
             </div>
         </div>
@@ -41,14 +44,18 @@
 
 <script setup>
 import { router } from '@inertiajs/vue3';
+import { computed } from 'vue';
 import ThemeToggle from '@/Components/ThemeToggle.vue';
+import Pagination from '@/Components/Pagination.vue';
 
-defineProps({
+const props = defineProps({
     conversations: {
-        type: Array,
-        default: () => []
+        type: Object,
+        default: () => ({ data: [], links: [] })
     }
 });
+
+const conversationsList = computed(() => props.conversations.data || props.conversations);
 
 const createConversation = () => {
     router.post(route('chat.store'));

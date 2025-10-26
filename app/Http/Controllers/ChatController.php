@@ -23,7 +23,7 @@ class ChatController extends Controller
             $query->latest()->limit(1);
         }])
             ->latest()
-            ->get();
+            ->paginate(10);
 
         return Inertia::render('Chat/Index', [
             'conversations' => $conversations,

@@ -60,13 +60,16 @@
                     </div>
                 </div>
 
-                <!-- Loading indicator -->
+                <!-- Typing indicator -->
                 <div v-if="loading" class="flex justify-start">
-                    <div class="bg-white dark:bg-gray-800 rounded-2xl rounded-bl-none px-5 py-3 shadow-md border border-gray-200 dark:border-gray-700">
-                        <div class="flex space-x-2">
-                            <div class="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                            <div class="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                            <div class="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl rounded-bl-none px-5 py-4 shadow-md border border-gray-200 dark:border-gray-700">
+                        <div class="flex items-center space-x-3">
+                            <div class="flex space-x-1.5">
+                                <div class="w-2.5 h-2.5 bg-blue-500 dark:bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                                <div class="w-2.5 h-2.5 bg-blue-500 dark:bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                                <div class="w-2.5 h-2.5 bg-blue-500 dark:bg-indigo-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                            </div>
+                            <span class="text-sm text-gray-500 dark:text-gray-400 italic">MeteoBot está escribiendo...</span>
                         </div>
                     </div>
                 </div>
@@ -94,13 +97,6 @@
                 </form>
             </div>
 
-            <!-- Error notification -->
-            <div
-                v-if="error"
-                class="absolute top-20 right-4 bg-red-500 dark:bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg animate-pulse"
-            >
-                {{ error }}
-            </div>
         </div>
     </div>
 </template>
@@ -111,6 +107,7 @@ import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 import ThemeToggle from '@/Components/ThemeToggle.vue';
 import { PaperAirplaneIcon } from '@heroicons/vue/24/solid';
+import { useToast } from '@/composables/useToast';
 
 const props = defineProps({
     conversation: {
@@ -119,9 +116,9 @@ const props = defineProps({
     }
 });
 
+const { success, error: showError } = useToast();
 const messageInput = ref('');
 const loading = ref(false);
-const error = ref('');
 const messagesContainer = ref(null);
 
 const sendMessage = async () => {
@@ -130,7 +127,6 @@ const sendMessage = async () => {
     const content = messageInput.value;
     messageInput.value = '';
     loading.value = true;
-    error.value = '';
 
     try {
         const response = await axios.post(
@@ -144,9 +140,8 @@ const sendMessage = async () => {
             scrollToBottom();
         }
     } catch (err) {
-        error.value = 'Error al enviar el mensaje. Por favor, intenta nuevamente.';
+        showError('Error al enviar el mensaje. Por favor, intenta nuevamente.');
         messageInput.value = content;
-        setTimeout(() => error.value = '', 5000);
     } finally {
         loading.value = false;
     }
