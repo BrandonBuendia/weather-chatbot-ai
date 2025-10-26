@@ -1,30 +1,33 @@
 <template>
-    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center p-4">
-        <div class="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col" style="height: 90vh;">
+    <div class="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-slate-800 flex items-center justify-center p-4 transition-colors duration-300">
+        <div class="w-full max-w-4xl bg-white dark:bg-gray-800 rounded-2xl shadow-2xl dark:shadow-gray-900/50 overflow-hidden flex flex-col" style="height: 90vh;">
             <!-- Header -->
-            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-4">
+            <div class="bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-indigo-700 dark:to-purple-800 text-white px-6 py-4">
                 <div class="flex items-center justify-between">
-                    <div>
+                    <div class="flex-1">
                         <h1 class="text-2xl font-bold">🌤️ MeteoBot</h1>
-                        <p class="text-blue-100 text-sm">Tu asistente meteorológico inteligente</p>
+                        <p class="text-blue-100 dark:text-indigo-200 text-sm">Tu asistente meteorológico inteligente</p>
                     </div>
-                    <button
-                        @click="createNewConversation"
-                        class="bg-white/20 hover:bg-white/30 transition px-4 py-2 rounded-lg text-sm font-medium"
-                    >
-                        + Nueva Conversación
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <ThemeToggle />
+                        <button
+                            @click="createNewConversation"
+                            class="bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20 transition px-4 py-2 rounded-lg text-sm font-medium"
+                        >
+                            + Nueva Conversación
+                        </button>
+                    </div>
                 </div>
             </div>
 
             <!-- Messages Container -->
-            <div ref="messagesContainer" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50">
+            <div ref="messagesContainer" class="flex-1 overflow-y-auto p-6 space-y-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
                 <div v-if="conversation.messages.length === 0" class="text-center py-20">
                     <div class="text-6xl mb-4">🌍</div>
-                    <h2 class="text-2xl font-semibold text-gray-700 mb-2">
+                    <h2 class="text-2xl font-semibold text-gray-700 dark:text-gray-200 mb-2">
                         ¡Hola! Soy MeteoBot
                     </h2>
-                    <p class="text-gray-500">
+                    <p class="text-gray-500 dark:text-gray-400">
                         Pregúntame sobre el clima en cualquier ciudad del mundo
                     </p>
                 </div>
@@ -39,17 +42,17 @@
                 >
                     <div
                         :class="[
-                            'max-w-xl rounded-2xl px-5 py-3 shadow-md',
+                            'max-w-xl rounded-2xl px-5 py-3 shadow-md transition-all duration-200',
                             message.role === 'user'
-                                ? 'bg-blue-600 text-white rounded-br-none'
-                                : 'bg-white text-gray-800 rounded-bl-none border border-gray-200'
+                                ? 'bg-blue-600 dark:bg-indigo-600 text-white rounded-br-none'
+                                : 'bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 rounded-bl-none border border-gray-200 dark:border-gray-700'
                         ]"
                     >
-                        <div v-html="formatMessage(message.content)" class="prose prose-sm max-w-none"></div>
+                        <div v-html="formatMessage(message.content)" class="prose prose-sm dark:prose-invert max-w-none"></div>
                         <div
                             :class="[
                                 'text-xs mt-2',
-                                message.role === 'user' ? 'text-blue-100' : 'text-gray-400'
+                                message.role === 'user' ? 'text-blue-100 dark:text-indigo-200' : 'text-gray-400 dark:text-gray-500'
                             ]"
                         >
                             {{ formatTime(message.created_at) }}
@@ -59,30 +62,30 @@
 
                 <!-- Loading indicator -->
                 <div v-if="loading" class="flex justify-start">
-                    <div class="bg-white rounded-2xl rounded-bl-none px-5 py-3 shadow-md border border-gray-200">
+                    <div class="bg-white dark:bg-gray-800 rounded-2xl rounded-bl-none px-5 py-3 shadow-md border border-gray-200 dark:border-gray-700">
                         <div class="flex space-x-2">
-                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
-                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
-                            <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
+                            <div class="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 0ms"></div>
+                            <div class="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 150ms"></div>
+                            <div class="w-2 h-2 bg-gray-400 dark:bg-gray-500 rounded-full animate-bounce" style="animation-delay: 300ms"></div>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Input Area -->
-            <div class="border-t border-gray-200 bg-white p-4">
+            <div class="border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 transition-colors duration-300">
                 <form @submit.prevent="sendMessage" class="flex space-x-3">
                     <input
                         v-model="messageInput"
                         type="text"
                         :disabled="loading"
                         placeholder="Pregunta sobre el clima en cualquier ciudad..."
-                        class="flex-1 rounded-full border-gray-300 focus:border-blue-500 focus:ring focus:ring-blue-200 focus:ring-opacity-50 px-6 py-3 disabled:bg-gray-100 disabled:cursor-not-allowed"
+                        class="flex-1 rounded-full border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-400 dark:placeholder-gray-500 focus:border-blue-500 dark:focus:border-indigo-500 focus:ring focus:ring-blue-200 dark:focus:ring-indigo-900 focus:ring-opacity-50 px-6 py-3 disabled:bg-gray-100 dark:disabled:bg-gray-800 disabled:cursor-not-allowed transition-colors"
                     />
                     <button
                         type="submit"
                         :disabled="!messageInput.trim() || loading"
-                        class="bg-blue-600 hover:bg-blue-700 text-white rounded-full px-8 py-3 font-semibold transition disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center space-x-2"
+                        class="bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white rounded-full px-8 py-3 font-semibold transition-all disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed flex items-center space-x-2"
                     >
                         <span>Enviar</span>
                         <span>📤</span>
@@ -93,7 +96,7 @@
             <!-- Error notification -->
             <div
                 v-if="error"
-                class="absolute top-20 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg animate-pulse"
+                class="absolute top-20 right-4 bg-red-500 dark:bg-red-600 text-white px-6 py-3 rounded-lg shadow-lg animate-pulse"
             >
                 {{ error }}
             </div>
@@ -105,6 +108,7 @@
 import { ref, onMounted, nextTick, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
+import ThemeToggle from '@/Components/ThemeToggle.vue';
 
 const props = defineProps({
     conversation: {
