@@ -22,14 +22,7 @@ class SendMessageAction
             'content' => $content,
         ]);
 
-        $conversationHistory = $conversation->messages()
-            ->orderBy('created_at')
-            ->get()
-            ->map(fn($msg) => [
-                'role' => $msg->role->value,
-                'content' => $msg->content,
-            ])
-            ->toArray();
+        $conversationHistory = $this->getConversationHistory($conversation);
 
         $assistantResponse = $this->openAIService->chat(
             $conversationHistory,
@@ -43,6 +36,21 @@ class SendMessageAction
         ]);
 
         return $assistantMessage;
+    }
+
+    private function getConversationHistory(Conversation $conversation): array
+    {
+        return $conversation->messages()
+            ->orderBy('created_at', 'desc')
+            ->limit(20)
+            ->get()
+            ->reverse()
+            ->values()
+            ->map(fn($msg) => [
+                'role' => $msg->role->value,
+                'content' => $msg->content,
+            ])
+            ->toArray();
     }
 }
 

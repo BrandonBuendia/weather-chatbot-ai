@@ -10,7 +10,9 @@ Route::prefix('chat')->name('chat.')->group(function () {
     Route::get('/', [ChatController::class, 'index'])->name('index');
     Route::post('/', [ChatController::class, 'store'])->name('store');
     Route::get('/{conversation}', [ChatController::class, 'show'])->name('show');
-    Route::post('/{conversation}/messages', [ChatController::class, 'sendMessage'])->name('messages.store');
+    Route::post('/{conversation}/messages', [ChatController::class, 'sendMessage'])
+        ->middleware('throttle:20,1')
+        ->name('messages.store');
 });
 
 Route::middleware('auth')->group(function () {

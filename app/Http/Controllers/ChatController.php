@@ -61,6 +61,11 @@ class ChatController extends Controller
                 'success' => true,
                 'conversation' => $conversation->load('messages'),
             ]);
+        } catch (\Illuminate\Http\Exceptions\ThrottleRequestsException $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Has enviado demasiados mensajes. Por favor, espera un momento antes de intentar nuevamente.',
+            ], 429);
         } catch (\Exception $e) {
             return response()->json([
                 'success' => false,

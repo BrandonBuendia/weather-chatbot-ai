@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\DTOs\WeatherData;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -10,28 +11,33 @@ class OpenMeteoService
 {
     private const BASE_URL = 'https://api.open-meteo.com/v1/forecast';
     private const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
+    private const CACHE_TTL = 900;
 
     public function getWeatherByCity(string $city): ?WeatherData
     {
-        try {
-            $coordinates = $this->geocodeCity($city);
+        $cacheKey = $this->getCacheKey($city);
 
-            if (!$coordinates) {
+        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($city) {
+            try {
+                $coordinates = $this->geocodeCity($city);
+
+                if (!$coordinates) {
+                    return null;
+                }
+
+                return $this->getWeatherByCoordinates(
+                    $coordinates['latitude'],
+                    $coordinates['longitude'],
+                    $coordinates['timezone']
+                );
+            } catch (\Exception $e) {
+                Log::error('Error getting weather by city', [
+                    'city' => $city,
+                    'error' => $e->getMessage(),
+                ]);
                 return null;
             }
-
-            return $this->getWeatherByCoordinates(
-                $coordinates['latitude'],
-                $coordinates['longitude'],
-                $coordinates['timezone']
-            );
-        } catch (\Exception $e) {
-            Log::error('Error getting weather by city', [
-                'city' => $city,
-                'error' => $e->getMessage(),
-            ]);
-            return null;
-        }
+        });
     }
 
     public function getWeatherByCoordinates(float $latitude, float $longitude, string $timezone = 'auto'): ?WeatherData
@@ -108,6 +114,11 @@ class OpenMeteoService
             ]);
             return null;
         }
+    }
+
+    private function getCacheKey(string $city): string
+    {
+        return 'weather:' . strtolower(trim($city));
     }
 }
 
