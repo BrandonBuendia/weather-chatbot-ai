@@ -85,10 +85,11 @@
                     <button
                         type="submit"
                         :disabled="!messageInput.trim() || loading"
-                        class="bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white rounded-full px-8 py-3 font-semibold transition-all disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed flex items-center space-x-2"
+                        class="bg-blue-600 hover:bg-blue-700 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white rounded-full px-6 py-3 font-semibold transition-all disabled:bg-gray-300 dark:disabled:bg-gray-700 disabled:cursor-not-allowed flex items-center justify-center w-32"
                     >
-                        <span>Enviar</span>
-                        <span>📤</span>
+                        <span v-if="!loading">Enviar</span>
+                        <PaperAirplaneIcon v-if="!loading" class="h-5 w-5 ms-2" />
+                        <span v-if="loading">Enviando...</span>
                     </button>
                 </form>
             </div>
@@ -109,6 +110,7 @@ import { ref, onMounted, nextTick, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 import ThemeToggle from '@/Components/ThemeToggle.vue';
+import { PaperAirplaneIcon } from '@heroicons/vue/24/solid';
 
 const props = defineProps({
     conversation: {
