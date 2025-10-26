@@ -3,45 +3,37 @@
 return [
     /*
     |--------------------------------------------------------------------------
-    | OpenAI API Key
+    | OpenAI API Key and Organization
     |--------------------------------------------------------------------------
     |
-    | Your OpenAI API Key. Get it from: https://platform.openai.com/api-keys
-    | Or use OpenRouter API Key: https://openrouter.ai/keys
-    |
+    | Here you may specify your OpenAI API Key and organization. This will be
+    | used to authenticate with the OpenAI API - you can find your API key
+    | and organization on your OpenAI dashboard, at https://openai.com.
     */
+
     'api_key' => env('OPENAI_API_KEY'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | API Base URL
-    |--------------------------------------------------------------------------
-    |
-    | For OpenAI: https://api.openai.com/v1 (default)
-    | For OpenRouter: https://openrouter.ai/api/v1
-    |
-    */
-    'base_url' => env('OPENAI_API_BASE', 'https://api.openai.com/v1'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | Organization ID (Optional)
-    |--------------------------------------------------------------------------
-    |
-    | Your OpenAI organization ID (optional)
-    |
-    */
     'organization' => env('OPENAI_ORGANIZATION'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | OpenAI API Base URI
+    |--------------------------------------------------------------------------
+    |
+    | Here you may specify a custom base URI for the OpenAI API, which may be
+    | useful if you're using a proxy or a third-party service such as
+    | OpenRouter.
+    */
+
+    'base_uri' => env('OPENAI_BASE_URI', 'api.openai.com/v1'),
 
     /*
     |--------------------------------------------------------------------------
     | Request Timeout
     |--------------------------------------------------------------------------
     |
-    | Timeout in seconds for API requests
-    |
+    | The timeout may be used to specify the maximum number of seconds to wait
+    | for a response.
     */
+
     'request_timeout' => env('OPENAI_REQUEST_TIMEOUT', 30),
 ];
-
-# cGFuZ29saW4=
