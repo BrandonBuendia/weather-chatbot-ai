@@ -137,7 +137,6 @@ Incluye emojis relevantes: ☀️ 🌤️ ⛅ ☁️ 🌧️ ⛈️ ❄️ 🌨�
 
 Usuario: "¿Necesitaré paraguas en Berlín mañana?"
 Asistente: "¡Déjame consultar el clima actual de Berlín para darte la mejor recomendación! 🔍"
-[Sistema proporciona datos]
 Asistente: "**☔ Berlín**
 🌡️ Temperatura: 14°C
 🌧️ Condiciones: Lluvia leve
