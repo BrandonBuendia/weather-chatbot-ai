@@ -134,14 +134,26 @@ mysql -u root -p -e "CREATE DATABASE weather_chatbot_ai CHARACTER SET utf8mb4 CO
 php artisan migrate
 ```
 
-### 7. Configurar OpenAI API Key
+### 7. Configurar OpenRouter API Key (Recomendado)
 
-Obtén tu API Key en: https://platform.openai.com/api-keys
+Por defecto, el proyecto usa **OpenRouter** para evitar límites de tasa restrictivos.
+
+Obtén tu API Key en: https://openrouter.ai/keys
 
 Edita el archivo `.env` y agrega:
 
 ```env
+OPENAI_API_KEY=sk-or-v1-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+OPENAI_API_BASE=https://openrouter.ai/api/v1
+```
+
+**Alternativa - Usar OpenAI directamente:**
+
+Si prefieres usar OpenAI directamente (https://platform.openai.com/api-keys):
+
+```env
 OPENAI_API_KEY=sk-proj-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+OPENAI_API_BASE=https://api.openai.com/v1
 ```
 
 ⚠️ **IMPORTANTE**: Nunca compartas ni subas tu API Key a repositorios públicos.
@@ -189,8 +201,9 @@ DB_DATABASE=weather_chatbot_ai
 DB_USERNAME=root
 DB_PASSWORD=
 
-# OpenAI
-OPENAI_API_KEY=sk-proj-xxxxx
+# OpenRouter (Recommended)
+OPENAI_API_KEY=sk-or-v1-xxxxx
+OPENAI_API_BASE=https://openrouter.ai/api/v1
 
 # Sesión y Cache
 SESSION_DRIVER=database
@@ -417,12 +430,22 @@ El prompt completo está en: `app/Services/OpenAIService.php` método `buildSyst
 
 ## 🌐 API Integrations
 
-### OpenAI API
+### OpenRouter / OpenAI API
 
+Por defecto, el proyecto usa **OpenRouter** como proxy para acceder a modelos de OpenAI con mejores límites de tasa.
+
+- **Proveedor**: OpenRouter (https://openrouter.ai)
 - **Modelo**: gpt-4o-mini
 - **Temperatura**: 0.7 (balance entre creatividad y precisión)
 - **Max Tokens**: 500 (respuestas concisas)
-- **Documentación**: https://platform.openai.com/docs
+- **Ventajas de OpenRouter**:
+  - Mejores límites de tasa que OpenAI directo
+  - Soporte para múltiples proveedores de LLM
+  - Precios competitivos
+  - Manejo mejorado de errores
+- **Documentación**:
+  - OpenRouter: https://openrouter.ai/docs
+  - OpenAI: https://platform.openai.com/docs
 
 ### Open-Meteo API
 
@@ -501,9 +524,19 @@ composer require openai-php/laravel
 npm run build
 ```
 
-### Error: "OpenAI API rate limit exceeded"
+### Error: "Se ha excedido el límite de peticiones"
 
-**Solución**: Verifica tu plan de OpenAI y límites en: https://platform.openai.com/account/limits
+**Solución**:
+
+1. **Recomendado**: Cambia a OpenRouter en tu `.env`:
+   ```env
+   OPENAI_API_KEY=sk-or-v1-tu_api_key
+   OPENAI_API_BASE=https://openrouter.ai/api/v1
+   ```
+
+2. Si usas OpenAI directo, verifica tus límites: https://platform.openai.com/account/limits
+
+3. Espera 1-2 minutos antes de reintentar (los límites se resetean automáticamente)
 
 ---
 

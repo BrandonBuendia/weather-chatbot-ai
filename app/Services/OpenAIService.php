@@ -57,7 +57,31 @@ class OpenAIService
             Log::error('Error in OpenAI chat', [
                 'error' => $e->getMessage(),
                 'conversation_id' => $conversationId,
+                'trace' => $e->getTraceAsString(),
             ]);
+
+            // Handle specific error types
+            $errorMessage = $e->getMessage();
+
+            // Rate limit error
+            if (str_contains($errorMessage, 'rate limit') || str_contains($errorMessage, 'Rate limit')) {
+                return 'Lo siento, se ha excedido el límite de peticiones. Por favor, espera un momento e intenta nuevamente.';
+            }
+
+            // Authentication error
+            if (str_contains($errorMessage, 'Incorrect API key') || str_contains($errorMessage, 'authentication')) {
+                return 'Error de autenticación con la API. Por favor, verifica la configuración.';
+            }
+
+            // Timeout error
+            if (str_contains($errorMessage, 'timeout') || str_contains($errorMessage, 'timed out')) {
+                return 'La solicitud tardó demasiado tiempo. Por favor, intenta nuevamente.';
+            }
+
+            // Network error
+            if (str_contains($errorMessage, 'Could not resolve host') || str_contains($errorMessage, 'network')) {
+                return 'Error de conexión. Por favor, verifica tu conexión a internet.';
+            }
 
             return 'Lo siento, ocurrió un error al procesar tu solicitud. Por favor, intenta nuevamente.';
         }
