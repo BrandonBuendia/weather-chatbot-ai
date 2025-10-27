@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\DTOs\WeatherData;
@@ -8,9 +10,16 @@ use OpenAI\Laravel\Facades\OpenAI;
 
 class OpenAIService
 {
+    private readonly string $model;
+    private readonly float $temperature;
+    private readonly int $maxTokens;
+
     public function __construct(
         private readonly OpenMeteoService $weatherService
     ) {
+        $this->model = config('services.openai.model', 'gpt-4o-mini');
+        $this->temperature = config('services.openai.temperature', 0.7);
+        $this->maxTokens = config('services.openai.max_tokens', 500);
     }
 
     public function chat(array $messages, ?int $conversationId = null): string
@@ -24,10 +33,10 @@ class OpenAIService
             ];
 
             $response = OpenAI::chat()->create([
-                'model' => 'gpt-4o-mini',
+                'model' => $this->model,
                 'messages' => $formattedMessages,
-                'temperature' => 0.7,
-                'max_tokens' => 500,
+                'temperature' => $this->temperature,
+                'max_tokens' => $this->maxTokens,
             ]);
 
             $assistantMessage = $response->choices[0]->message->content;
@@ -42,10 +51,10 @@ class OpenAIService
                 ]);
 
                 $finalResponse = OpenAI::chat()->create([
-                    'model' => 'gpt-4o-mini',
+                    'model' => $this->model,
                     'messages' => $enrichedMessages,
-                    'temperature' => 0.7,
-                    'max_tokens' => 500,
+                    'temperature' => $this->temperature,
+                    'max_tokens' => $this->maxTokens,
                 ]);
 
                 return $finalResponse->choices[0]->message->content;

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit;
 
 use App\DTOs\WeatherData;
@@ -465,6 +467,129 @@ class OpenAIServiceTest extends TestCase
 
             $this->assertIsString($response);
         }
+    }
+
+    public function test_chat_handles_http_500_error_from_api(): void
+    {
+        Log::shouldReceive('error')->once();
+
+        OpenAIFacade::shouldReceive('chat->create')
+            ->andThrow(new \Exception('Server returned HTTP 500 Internal Server Error'));
+
+        $messages = [
+            ['role' => 'user', 'content' => 'Test message'],
+        ];
+
+        $response = $this->service->chat($messages);
+
+        $this->assertIsString($response);
+        $this->assertStringContainsString('ocurrió un error', $response);
+    }
+
+    public function test_chat_handles_empty_response_from_api(): void
+    {
+        $this->mockWeatherService
+            ->shouldReceive('getWeatherByCity')
+            ->never();
+
+        OpenAIFacade::fake([
+            CreateResponse::fake([
+                'choices' => [
+                    [
+                        'message' => [
+                            'content' => '',
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        $messages = [
+            ['role' => 'user', 'content' => 'Test'],
+        ];
+
+        $response = $this->service->chat($messages);
+
+        $this->assertIsString($response);
+        $this->assertEquals('', $response);
+    }
+
+    public function test_chat_handles_service_unavailable_error(): void
+    {
+        Log::shouldReceive('error')->once();
+
+        OpenAIFacade::shouldReceive('chat->create')
+            ->andThrow(new \Exception('Service temporarily unavailable'));
+
+        $messages = [
+            ['role' => 'user', 'content' => 'Test message'],
+        ];
+
+        $response = $this->service->chat($messages);
+
+        $this->assertIsString($response);
+        $this->assertStringContainsString('ocurrió un error', $response);
+    }
+
+    public function test_chat_handles_conversation_with_maximum_history(): void
+    {
+        $this->mockWeatherService
+            ->shouldReceive('getWeatherByCity')
+            ->never();
+
+        OpenAIFacade::fake([
+            CreateResponse::fake([
+                'choices' => [
+                    [
+                        'message' => [
+                            'content' => 'Respuesta con historial largo',
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        // Create 20 messages (maximum history limit from config)
+        $messages = [];
+        for ($i = 0; $i < 20; $i++) {
+            $messages[] = ['role' => 'user', 'content' => "Mensaje $i"];
+            $messages[] = ['role' => 'assistant', 'content' => "Respuesta $i"];
+        }
+
+        $response = $this->service->chat($messages);
+
+        $this->assertIsString($response);
+        $this->assertEquals('Respuesta con historial largo', $response);
+    }
+
+    public function test_chat_validates_message_content_length(): void
+    {
+        $this->mockWeatherService
+            ->shouldReceive('getWeatherByCity')
+            ->never();
+
+        OpenAIFacade::fake([
+            CreateResponse::fake([
+                'choices' => [
+                    [
+                        'message' => [
+                            'content' => 'Respuesta válida',
+                        ],
+                    ],
+                ],
+            ]),
+        ]);
+
+        // Test with exactly 1000 characters (maximum allowed)
+        $longMessage = str_repeat('a', 1000);
+        $messages = [
+            ['role' => 'user', 'content' => $longMessage],
+        ];
+
+        $response = $this->service->chat($messages);
+
+        $this->assertIsString($response);
+        $this->assertEquals('Respuesta válida', $response);
     }
 }
 

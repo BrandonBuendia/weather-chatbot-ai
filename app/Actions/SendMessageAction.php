@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Actions;
 
 use App\Enums\MessageRole;
@@ -40,9 +42,11 @@ class SendMessageAction
 
     private function getConversationHistory(Conversation $conversation): array
     {
+        $historyLimit = config('chat.history_limit', 20);
+
         return $conversation->messages()
             ->orderBy('created_at', 'desc')
-            ->limit(20)
+            ->limit($historyLimit)
             ->get()
             ->reverse()
             ->values()

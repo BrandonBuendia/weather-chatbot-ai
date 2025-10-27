@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 return [
 
     /*
@@ -33,6 +35,36 @@ return [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
             'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | OpenMeteo Weather Service
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the Open-Meteo weather API integration.
+    |
+    */
+
+    'openmeteo' => [
+        'base_url' => env('OPENMETEO_BASE_URL', 'https://api.open-meteo.com/v1/forecast'),
+        'geocoding_url' => env('OPENMETEO_GEOCODING_URL', 'https://geocoding-api.open-meteo.com/v1/search'),
+        'cache_ttl' => env('OPENMETEO_CACHE_TTL', 900), // 15 minutes in seconds
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | OpenAI Service
+    |--------------------------------------------------------------------------
+    |
+    | Configuration for the OpenAI/OpenRouter integration.
+    |
+    */
+
+    'openai' => [
+        'model' => env('OPENAI_MODEL', 'gpt-4o-mini'),
+        'temperature' => env('OPENAI_TEMPERATURE', 0.7),
+        'max_tokens' => env('OPENAI_MAX_TOKENS', 500),
     ],
 
 ];

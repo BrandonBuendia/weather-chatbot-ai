@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Services;
 
 use App\DTOs\WeatherData;
@@ -9,15 +11,22 @@ use Illuminate\Support\Facades\Log;
 
 class OpenMeteoService
 {
-    private const BASE_URL = 'https://api.open-meteo.com/v1/forecast';
-    private const GEOCODING_URL = 'https://geocoding-api.open-meteo.com/v1/search';
-    private const CACHE_TTL = 900;
+    private readonly string $baseUrl;
+    private readonly string $geocodingUrl;
+    private readonly int $cacheTtl;
+
+    public function __construct()
+    {
+        $this->baseUrl = config('services.openmeteo.base_url');
+        $this->geocodingUrl = config('services.openmeteo.geocoding_url');
+        $this->cacheTtl = config('services.openmeteo.cache_ttl', 900);
+    }
 
     public function getWeatherByCity(string $city): ?WeatherData
     {
         $cacheKey = $this->getCacheKey($city);
 
-        return Cache::remember($cacheKey, self::CACHE_TTL, function () use ($city) {
+        return Cache::remember($cacheKey, $this->cacheTtl, function () use ($city) {
             try {
                 $coordinates = $this->geocodeCity($city);
 
@@ -43,7 +52,7 @@ class OpenMeteoService
     public function getWeatherByCoordinates(float $latitude, float $longitude, string $timezone = 'auto'): ?WeatherData
     {
         try {
-            $response = Http::get(self::BASE_URL, [
+            $response = Http::get($this->baseUrl, [
                 'latitude' => $latitude,
                 'longitude' => $longitude,
                 'current_weather' => true,
@@ -81,7 +90,7 @@ class OpenMeteoService
     private function geocodeCity(string $city): ?array
     {
         try {
-            $response = Http::get(self::GEOCODING_URL, [
+            $response = Http::get($this->geocodingUrl, [
                 'name' => $city,
                 'count' => 1,
                 'language' => 'es',
