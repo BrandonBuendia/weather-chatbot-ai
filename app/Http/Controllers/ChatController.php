@@ -21,11 +21,13 @@ class ChatController extends Controller
 
     public function index(): Response
     {
+        $perPage = config('chat.conversations_per_page', 10);
+
         $conversations = Conversation::with(['messages' => function ($query) {
             $query->latest()->limit(1);
         }])
             ->latest()
-            ->paginate(10);
+            ->paginate($perPage);
 
         return Inertia::render('Chat/Index', [
             'conversations' => $conversations,

@@ -38,9 +38,11 @@
                         </svg>
                         Conversaciones Recientes
                     </h2>
-                    <span class="text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-full">
-                        {{ conversationsList.length }} conversación{{ conversationsList.length !== 1 ? 'es' : '' }}
-                    </span>
+                    <div class="flex gap-2 items-center">
+                        <span class="text-sm text-gray-500 dark:text-gray-400 bg-gray-200 dark:bg-gray-700 px-4 py-2 rounded-full">
+                            Mostrando {{ conversationsList.length }} de {{ conversations.total || conversationsList.length }}
+                        </span>
+                    </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -108,7 +110,10 @@
                 </div>
 
                 <!-- Pagination -->
-                <Pagination v-if="conversations.links" :links="conversations.links" />
+                <Pagination
+                    v-if="conversations && conversations.links && conversations.links.length > 0"
+                    :links="conversations.links"
+                />
             </div>
 
             <!-- Empty State -->
@@ -140,7 +145,15 @@ const props = defineProps({
     }
 });
 
-const conversationsList = computed(() => props.conversations.data || props.conversations);
+const conversationsList = computed(() => {
+    // Laravel pagination returns an object with 'data' property
+    // If conversations has 'data', it's a paginated response
+    if (props.conversations && Array.isArray(props.conversations.data)) {
+        return props.conversations.data;
+    }
+    // Otherwise, it's a direct array (shouldn't happen with pagination)
+    return Array.isArray(props.conversations) ? props.conversations : [];
+});
 
 const createConversation = () => {
     router.post(route('chat.store'));

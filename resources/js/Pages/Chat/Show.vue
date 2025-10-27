@@ -9,12 +9,19 @@
                         <p class="text-blue-100 dark:text-indigo-200 text-sm">Tu asistente meteorológico inteligente</p>
                     </div>
                     <div class="flex items-center gap-3">
+                        <button
+                            @click="goToHistory"
+                            class="group bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:scale-105 active:scale-95"
+                        >
+                            <ArrowLeftIcon class="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-300" />
+                            <span>Historial</span>
+                        </button>
                         <ThemeToggle />
                         <button
                             @click="createNewConversation"
-                            class="bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20 transition px-4 py-2 rounded-lg text-sm font-medium"
+                            class="group bg-white/20 hover:bg-white/30 dark:bg-white/10 dark:hover:bg-white/20 transition-all duration-300 px-4 py-2 rounded-lg text-sm font-medium flex items-center gap-2 hover:scale-105 active:scale-95"
                         >
-                            + Nueva Conversación
+                            <span>+ Nueva Conversación</span>
                         </button>
                     </div>
                 </div>
@@ -106,7 +113,7 @@ import { ref, onMounted, nextTick, watch } from 'vue';
 import { router } from '@inertiajs/vue3';
 import axios from 'axios';
 import ThemeToggle from '@/Components/ThemeToggle.vue';
-import { PaperAirplaneIcon } from '@heroicons/vue/24/solid';
+import { PaperAirplaneIcon, ArrowLeftIcon } from '@heroicons/vue/24/solid';
 import { useToast } from '@/composables/useToast';
 
 const props = defineProps({
@@ -149,6 +156,10 @@ const sendMessage = async () => {
 
 const createNewConversation = () => {
     router.post(route('chat.store'));
+};
+
+const goToHistory = () => {
+    router.get(route('chat.index'));
 };
 
 const formatMessage = (content) => {
